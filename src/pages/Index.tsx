@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -110,17 +109,37 @@ const Index = () => {
     // Simulate AI API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Mock AI responses
+    // Enhanced AI responses with more specific answers
     const responses: { [key: string]: string } = {
-      'What is this?': 'This appears to be an object you are looking at. I would need more context to provide a specific answer.',
-      'Who is this?': 'This is a person in your field of view. I cannot identify specific individuals for privacy reasons.',
-      'Where am I?': 'You appear to be in an indoor/outdoor location. For specific location details, please check your GPS.',
-      'How do I do this?': 'To complete this task, follow the standard procedure or consult the relevant documentation.',
-      'When does this happen?': 'The timing depends on the specific context of what you are referring to.',
-      'Why does this happen?': 'This occurs due to various factors that would need more context to explain specifically.'
+      'What is this?': 'Based on visual analysis, this appears to be an everyday object. For more specific identification, please describe what you see or provide more context about the item you\'re looking at.',
+      'Who is this?': 'I can see a person in your field of view. For privacy and safety reasons, I cannot identify specific individuals, but I can help describe what I observe about their appearance or actions if that would be helpful.',
+      'Where am I?': 'You appear to be in an indoor environment. To provide more specific location information, I would need access to your GPS data or more visual context about your surroundings.',
+      'How do I do this?': 'To help you with the specific task, I need more details about what you\'re trying to accomplish. Please describe the activity or process you need assistance with.',
+      'When does this happen?': 'The timing of events depends on the specific context. Could you provide more details about what you\'re referring to so I can give you accurate timing information?',
+      'Why does this happen?': 'There are usually multiple factors that contribute to any phenomenon. To give you a precise explanation, I need more context about what specific event or situation you\'re asking about.'
     };
     
-    return responses[question] || 'I need more information to provide a helpful answer.';
+    // If the exact question isn't found, provide a contextual response
+    if (responses[question]) {
+      return responses[question];
+    }
+    
+    // Provide more helpful fallback responses based on question type
+    if (question.toLowerCase().includes('what')) {
+      return 'I can help identify objects, explain concepts, or provide information. Could you be more specific about what you\'d like to know?';
+    } else if (question.toLowerCase().includes('who')) {
+      return 'I can provide general information about people, roles, or historical figures, but I cannot identify specific individuals from images for privacy reasons.';
+    } else if (question.toLowerCase().includes('where')) {
+      return 'I can help with location-based questions. For specific directions or locations, please provide more context about where you\'re trying to go or what you\'re looking for.';
+    } else if (question.toLowerCase().includes('how')) {
+      return 'I\'m ready to provide step-by-step instructions. Please tell me more about the specific process or task you need help with.';
+    } else if (question.toLowerCase().includes('when')) {
+      return 'I can help with timing and scheduling questions. Please provide more details about the event or timeframe you\'re asking about.';
+    } else if (question.toLowerCase().includes('why')) {
+      return 'I can explain reasons and causes. Please give me more context about what phenomenon or situation you\'d like me to explain.';
+    }
+    
+    return 'I\'m here to help! Could you please rephrase your question or provide more specific details about what you\'d like to know?';
   };
 
   const sendToGlasses = async (text: string) => {
