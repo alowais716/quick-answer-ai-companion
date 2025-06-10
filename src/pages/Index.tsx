@@ -60,10 +60,11 @@ const Index = () => {
     setIsProcessing(true);
     
     try {
-      // Simulate translation to English
+      // Always translate to English first
       const englishQuestion = await translateToEnglish(arabicText);
+      console.log('Translated question:', englishQuestion);
       
-      // Simulate AI answer
+      // Get AI answer for the translated question
       const answer = await getAIAnswer(englishQuestion);
       
       setCurrentAnswer(answer);
@@ -90,61 +91,90 @@ const Index = () => {
 
   const translateToEnglish = async (arabicText: string): Promise<string> => {
     // Simulate translation API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Clean the Arabic text
+    const cleanArabicText = arabicText.trim();
+    console.log('Translating Arabic:', cleanArabicText);
     
     // Enhanced translations for common Arabic questions
     const translations: { [key: string]: string } = {
       'ما هذا؟': 'What is this?',
+      'ما هذا': 'What is this?',
       'من هذا؟': 'Who is this?',
+      'من هذا': 'Who is this?',
       'أين أنا؟': 'Where am I?',
+      'أين أنا': 'Where am I?',
       'كيف أفعل هذا؟': 'How do I do this?',
+      'كيف أفعل هذا': 'How do I do this?',
       'متى يحدث هذا؟': 'When does this happen?',
+      'متى يحدث هذا': 'When does this happen?',
       'لماذا يحدث هذا؟': 'Why does this happen?',
+      'لماذا يحدث هذا': 'Why does this happen?',
       'ما هي سرعة الضوء؟': 'What is the speed of light?',
+      'ما هي سرعة الضوء': 'What is the speed of light?',
       'ما هو الوقت؟': 'What time is it?',
+      'ما هو الوقت': 'What time is it?',
       'كيف الطقس؟': 'How is the weather?',
+      'كيف الطقس': 'How is the weather?',
       'ما هو اسمك؟': 'What is your name?',
+      'ما هو اسمك': 'What is your name?',
       'أين المطعم؟': 'Where is the restaurant?',
+      'أين المطعم': 'Where is the restaurant?',
       'كم العمر؟': 'How old?',
+      'كم العمر': 'How old?',
       'ما هو لونك المفضل؟': 'What is your favorite color?',
+      'ما هو لونك المفضل': 'What is your favorite color?',
       'كيف تعمل؟': 'How does it work?',
+      'كيف تعمل': 'How does it work?',
       'متى ستصل؟': 'When will you arrive?',
-      'لماذا هذا مهم؟': 'Why is this important?'
+      'متى ستصل': 'When will you arrive?',
+      'لماذا هذا مهم؟': 'Why is this important?',
+      'لماذا هذا مهم': 'Why is this important?'
     };
     
-    // Check for exact matches first
-    if (translations[arabicText]) {
-      return translations[arabicText];
+    // Check for exact matches first (with and without question marks)
+    if (translations[cleanArabicText]) {
+      return translations[cleanArabicText];
     }
     
-    // Check for partial matches for more flexible translation
-    for (const [arabic, english] of Object.entries(translations)) {
-      if (arabicText.includes(arabic.split('؟')[0])) {
-        return english;
-      }
+    // Enhanced pattern-based translation for any Arabic question
+    if (cleanArabicText.includes('ما هي') || cleanArabicText.includes('ما هو')) {
+      // Extract the subject after "ما هي/ما هو"
+      const subject = cleanArabicText.replace(/ما هي |ما هو |؟/g, '').trim();
+      return `What is ${subject}?`;
+    } else if (cleanArabicText.includes('من هو') || cleanArabicText.includes('من هي')) {
+      const subject = cleanArabicText.replace(/من هو |من هي |؟/g, '').trim();
+      return `Who is ${subject}?`;
+    } else if (cleanArabicText.includes('أين')) {
+      const location = cleanArabicText.replace(/أين |؟/g, '').trim();
+      return `Where is ${location}?`;
+    } else if (cleanArabicText.includes('كيف')) {
+      const action = cleanArabicText.replace(/كيف |؟/g, '').trim();
+      return `How ${action}?`;
+    } else if (cleanArabicText.includes('متى')) {
+      const event = cleanArabicText.replace(/متى |؟/g, '').trim();
+      return `When ${event}?`;
+    } else if (cleanArabicText.includes('لماذا')) {
+      const reason = cleanArabicText.replace(/لماذا |؟/g, '').trim();
+      return `Why ${reason}?`;
+    } else if (cleanArabicText.includes('هل')) {
+      const question = cleanArabicText.replace(/هل |؟/g, '').trim();
+      return `Is ${question}?`;
+    } else if (cleanArabicText.includes('ماذا')) {
+      const action = cleanArabicText.replace(/ماذا |؟/g, '').trim();
+      return `What ${action}?`;
     }
     
-    // Enhanced fallback translation logic
-    if (arabicText.includes('ما هي') || arabicText.includes('ما هو')) {
-      return `What is ${arabicText.replace(/ما هي |ما هو |؟/g, '').trim()}?`;
-    } else if (arabicText.includes('من هو') || arabicText.includes('من هي')) {
-      return `Who is ${arabicText.replace(/من هو |من هي |؟/g, '').trim()}?`;
-    } else if (arabicText.includes('أين')) {
-      return `Where is ${arabicText.replace(/أين |؟/g, '').trim()}?`;
-    } else if (arabicText.includes('كيف')) {
-      return `How ${arabicText.replace(/كيف |؟/g, '').trim()}?`;
-    } else if (arabicText.includes('متى')) {
-      return `When ${arabicText.replace(/متى |؟/g, '').trim()}?`;
-    } else if (arabicText.includes('لماذا')) {
-      return `Why ${arabicText.replace(/لماذا |؟/g, '').trim()}?`;
-    }
-    
-    return 'What is this about?';
+    // If no pattern matches, create a general question
+    return `Please explain about: ${cleanArabicText}`;
   };
 
   const getAIAnswer = async (question: string): Promise<string> => {
     // Simulate AI API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    console.log('Getting AI answer for:', question);
     
     // Enhanced AI responses with more specific answers
     const responses: { [key: string]: string } = {
@@ -166,27 +196,39 @@ const Index = () => {
       'Why is this important?': 'I need more context about what specific topic you\'re referring to in order to explain its importance.'
     };
     
-    // If the exact question isn't found, provide a contextual response
+    // Check for exact match first
     if (responses[question]) {
       return responses[question];
     }
     
-    // Provide more helpful fallback responses based on question type
-    if (question.toLowerCase().includes('what')) {
-      return 'I can help identify objects, explain concepts, or provide information. Could you be more specific about what you\'d like to know?';
-    } else if (question.toLowerCase().includes('who')) {
-      return 'I can provide general information about people, roles, or historical figures, but I cannot identify specific individuals from images for privacy reasons.';
-    } else if (question.toLowerCase().includes('where')) {
-      return 'I can help with location-based questions. For specific directions or locations, please provide more context about where you\'re trying to go or what you\'re looking for.';
-    } else if (question.toLowerCase().includes('how')) {
-      return 'I\'m ready to provide step-by-step instructions. Please tell me more about the specific process or task you need help with.';
-    } else if (question.toLowerCase().includes('when')) {
-      return 'I can help with timing and scheduling questions. Please provide more details about the event or timeframe you\'re asking about.';
-    } else if (question.toLowerCase().includes('why')) {
-      return 'I can explain reasons and causes. Please give me more context about what phenomenon or situation you\'d like me to explain.';
+    // Provide intelligent fallback responses based on question patterns
+    const lowerQuestion = question.toLowerCase();
+    
+    if (lowerQuestion.includes('what is') || lowerQuestion.includes('what are')) {
+      const subject = question.replace(/what is |what are |please explain about: |\?/gi, '').trim();
+      return `${subject} is a concept I can help explain. Based on your question about "${subject}", this typically refers to a specific topic or object. Could you provide more context so I can give you a more detailed and accurate explanation?`;
+    } else if (lowerQuestion.includes('who is') || lowerQuestion.includes('who are')) {
+      const person = question.replace(/who is |who are |\?/gi, '').trim();
+      return `You're asking about "${person}". I can provide general information about people, roles, or historical figures, but I cannot identify specific individuals from images for privacy reasons. Could you provide more context about what you'd like to know?`;
+    } else if (lowerQuestion.includes('where is') || lowerQuestion.includes('where are')) {
+      const location = question.replace(/where is |where are |\?/gi, '').trim();
+      return `You're looking for "${location}". I can help with location-based questions, but I would need more specific details or access to mapping services to provide accurate directions or location information.`;
+    } else if (lowerQuestion.includes('how')) {
+      const process = question.replace(/how |\?/gi, '').trim();
+      return `You're asking about how to "${process}". I'm ready to provide step-by-step instructions or explanations. Could you give me more details about the specific process or task you need help with?`;
+    } else if (lowerQuestion.includes('when')) {
+      const event = question.replace(/when |\?/gi, '').trim();
+      return `You're asking about the timing of "${event}". I can help with timing and scheduling questions, but I would need more context about the specific event or timeframe you're referring to.`;
+    } else if (lowerQuestion.includes('why')) {
+      const reason = question.replace(/why |\?/gi, '').trim();
+      return `You're asking why "${reason}". I can explain reasons and causes, but I would need more context about the specific situation or phenomenon you'd like me to explain.`;
+    } else if (lowerQuestion.includes('is ')) {
+      const topic = question.replace(/is |\?/gi, '').trim();
+      return `You're asking about "${topic}". This appears to be a yes/no question or a request for confirmation. Could you provide more details so I can give you a more specific answer?`;
     }
     
-    return 'I\'m here to help! Could you please rephrase your question or provide more specific details about what you\'d like to know?';
+    // Final fallback for any other question
+    return `I understand you're asking: "${question}". I'm here to help with a wide variety of questions! Could you please provide a bit more context or rephrase your question so I can give you the most helpful and accurate answer possible?`;
   };
 
   const sendToGlasses = async (text: string) => {
