@@ -92,17 +92,54 @@ const Index = () => {
     // Simulate translation API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Mock translations for common Arabic questions
+    // Enhanced translations for common Arabic questions
     const translations: { [key: string]: string } = {
       'ما هذا؟': 'What is this?',
       'من هذا؟': 'Who is this?',
       'أين أنا؟': 'Where am I?',
       'كيف أفعل هذا؟': 'How do I do this?',
       'متى يحدث هذا؟': 'When does this happen?',
-      'لماذا يحدث هذا؟': 'Why does this happen?'
+      'لماذا يحدث هذا؟': 'Why does this happen?',
+      'ما هي سرعة الضوء؟': 'What is the speed of light?',
+      'ما هو الوقت؟': 'What time is it?',
+      'كيف الطقس؟': 'How is the weather?',
+      'ما هو اسمك؟': 'What is your name?',
+      'أين المطعم؟': 'Where is the restaurant?',
+      'كم العمر؟': 'How old?',
+      'ما هو لونك المفضل؟': 'What is your favorite color?',
+      'كيف تعمل؟': 'How does it work?',
+      'متى ستصل؟': 'When will you arrive?',
+      'لماذا هذا مهم؟': 'Why is this important?'
     };
     
-    return translations[arabicText] || 'What is this about?';
+    // Check for exact matches first
+    if (translations[arabicText]) {
+      return translations[arabicText];
+    }
+    
+    // Check for partial matches for more flexible translation
+    for (const [arabic, english] of Object.entries(translations)) {
+      if (arabicText.includes(arabic.split('؟')[0])) {
+        return english;
+      }
+    }
+    
+    // Enhanced fallback translation logic
+    if (arabicText.includes('ما هي') || arabicText.includes('ما هو')) {
+      return `What is ${arabicText.replace(/ما هي |ما هو |؟/g, '').trim()}?`;
+    } else if (arabicText.includes('من هو') || arabicText.includes('من هي')) {
+      return `Who is ${arabicText.replace(/من هو |من هي |؟/g, '').trim()}?`;
+    } else if (arabicText.includes('أين')) {
+      return `Where is ${arabicText.replace(/أين |؟/g, '').trim()}?`;
+    } else if (arabicText.includes('كيف')) {
+      return `How ${arabicText.replace(/كيف |؟/g, '').trim()}?`;
+    } else if (arabicText.includes('متى')) {
+      return `When ${arabicText.replace(/متى |؟/g, '').trim()}?`;
+    } else if (arabicText.includes('لماذا')) {
+      return `Why ${arabicText.replace(/لماذا |؟/g, '').trim()}?`;
+    }
+    
+    return 'What is this about?';
   };
 
   const getAIAnswer = async (question: string): Promise<string> => {
@@ -116,7 +153,17 @@ const Index = () => {
       'Where am I?': 'You appear to be in an indoor environment. To provide more specific location information, I would need access to your GPS data or more visual context about your surroundings.',
       'How do I do this?': 'To help you with the specific task, I need more details about what you\'re trying to accomplish. Please describe the activity or process you need assistance with.',
       'When does this happen?': 'The timing of events depends on the specific context. Could you provide more details about what you\'re referring to so I can give you accurate timing information?',
-      'Why does this happen?': 'There are usually multiple factors that contribute to any phenomenon. To give you a precise explanation, I need more context about what specific event or situation you\'re asking about.'
+      'Why does this happen?': 'There are usually multiple factors that contribute to any phenomenon. To give you a precise explanation, I need more context about what specific event or situation you\'re asking about.',
+      'What is the speed of light?': 'The speed of light in a vacuum is approximately 299,792,458 meters per second (about 186,282 miles per second). This is a fundamental physical constant denoted by the letter "c" and is the maximum speed at which all matter and information in the universe can travel.',
+      'What time is it?': `The current time is ${new Date().toLocaleTimeString()}.`,
+      'How is the weather?': 'I don\'t have access to current weather data. Please check your weather app or ask a voice assistant with internet access for current weather conditions.',
+      'What is your name?': 'I\'m Quick Answer AI, your personal assistant for answering questions through your G1 glasses.',
+      'Where is the restaurant?': 'I need more specific information about which restaurant you\'re looking for. Could you provide the name or type of restaurant?',
+      'How old?': 'I need more context about what or whom you\'re asking about to provide age information.',
+      'What is your favorite color?': 'As an AI, I don\'t have personal preferences, but I can help you with information about colors or color theory if you\'d like.',
+      'How does it work?': 'I need more context about what specific thing you\'re asking about to explain how it works.',
+      'When will you arrive?': 'I\'m an AI assistant, so I don\'t physically travel. Could you clarify what you\'re asking about?',
+      'Why is this important?': 'I need more context about what specific topic you\'re referring to in order to explain its importance.'
     };
     
     // If the exact question isn't found, provide a contextual response
